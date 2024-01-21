@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles_add.css') }}">
+    <title>SlugSearch</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const locationDropdown = document.getElementById('locationDropdown');
+            const selectedLocation = document.getElementById('selectedLocation');
+            const categoryDropdown = document.getElementById('categoryDropdown');
+            const selectedCategory = document.getElementById('selectedCategory');
+            const selectedLocationInput = document.getElementById('selectedLocationInput');
+            const selectedCategoryInput = document.getElementById('selectedCategoryInput');
+            const fileInput = document.getElementById('file');
+            const selectedFile = document.getElementById('selectedFile');
+            const selectedImage = document.getElementById('selectedImage');
+            const fileLabel = document.querySelector('.file-label');
+
+            locationDropdown.addEventListener('click', function (event) {
+                if (event.target.tagName === 'BUTTON') {
+                    selectedLocation.textContent = event.target.textContent;
+                    selectedLocationInput.value = event.target.textContent; // Update the hidden input
+                }
+            });
+
+            categoryDropdown.addEventListener('click', function (event) {
+                if (event.target.tagName === 'BUTTON') {
+                    selectedCategory.textContent = event.target.textContent;
+                    selectedCategoryInput.value = event.target.textContent; // Update the hidden input
+                }
+            });
+
+            fileInput.addEventListener('change', function () {
+                const file = fileInput.files.length > 0 ? fileInput.files[0] : null;
+
+                if (file) {
+                    selectedFile.textContent = file.name;
+                    const reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        selectedImage.src = e.target.result;
+                    };
+
+                    reader.readAsDataURL(file);
+                } else {
+                    selectedFile.textContent = 'Choose a File';
+                    selectedImage.src = ''; // Clear the image source
+                }
+            });
+
+            selectedFile.addEventListener('click', function () {
+                fileInput.click(); // Trigger the file input click when the label is clicked
+            });
+        });
+    </script>
+</head>
+<body>
+    <header class="header">
+        <a class="hide"><strong>+</strong></a>
+        <div class="slugsearch">SlugSearch</div>
+        <a href="{{ url_for('index') }}" class="add-button">Search</a>
+    </header>
+    <div class="container">
+        <h1 class="title">Upload Missing Item</h1>
+        <div class="rectangular-box">
+            <img id="selectedImage">
+        </div>
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            <div class="dropdown">
+                <label for="file">Select Image:</label>
+                <div class="selected-file" id="selectedFile" for="file">Choose a File</div>
+                <input type="file" name="file" id="file" required class="file-input">
+            </div><br><br>
+
+            <div class="dropdown">
+                <label for="location">Selected Location:</label>
+                <div class="selected-location" id="selectedLocation">Select a Location</div>
+                <div class="dropdown-content" id="locationDropdown">
+                    {% for loc in locations %}
+                        <button type="button">{{ loc }}</button>
+                    {% endfor %}
+                </div>
+            </div><br><br>
+
+            <div class="dropdown">
+                <label for="category">Selected Category:</label>
+                <div class="selected-category" id="selectedCategory">Select a Category</div>
+                <div class="dropdown-content" id="categoryDropdown">
+                    {% for cat in categories %}
+                        <button type="button">{{ cat }}</button>
+                    {% endfor %}
+                </div>
+            </div><br><br>
+
+            <div class="description-box">
+                <label for="description">Description:</label>
+                <textarea name="description" id="descriptionInput" rows="4" cols="50" placeholder="Enter a description..."></textarea>
+            </div><br><br>
+            <input type="hidden" name="selected_location" id="selectedLocationInput" value="">
+            <input type="hidden" name="selected_category" id="selectedCategoryInput" value="">
+            <input type="submit" value="Upload" class="upload-button" id="uploadButton">
+        </form>
+        
+    </div>
+</body>
+</html>

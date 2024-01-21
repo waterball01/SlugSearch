@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <title>SlugSearch</title>
+    <script>
+        function claimItem(itemId) {
+            // Make an AJAX request to the server to handle the claim
+            fetch('/claim/' + itemId, { method: 'POST' })
+                .then(response => {
+                    if (response.ok) {
+                        // Reload the page after successful claim
+                        location.reload();
+                    }
+                })
+                .catch(error => console.error('Error claiming item:', error));
+        }
+    </script>
+</head>
+<body>
+    <header class="header">
+        <form method="post" action="/">
+            <div class="dropdown">
+                <div class="menu-btn">
+                    <img src="{{ url_for('static', filename='745228.png') }}" alt="Menu">
+                    <span class="menu-text">Location</span>
+                </div>
+                <div class="dropdown-content">
+                    {% for location in locations %}
+                        <button type="submit" name="location" value="{{ location }}">{{ location }}</button>
+                    {% endfor %}
+                    <button type="submit" name="location" value="all">All Locations</button>
+                </div>
+            </div>
+            <div class="dropdown">
+                <div class="menu-btn">
+                    <img src="{{ url_for('static', filename='cate.png') }}" alt="Menu">
+                    <span class="menu-text">Category</span>
+                </div>
+                <div class="dropdown-content">
+                    {% for category in categories %}
+                        <button type="submit" name="category" value="{{ category }}">{{ category }}</button>
+                    {% endfor %}
+                    <button type="submit" name="category" value="all">All Categories</button>
+                </div>
+            </div>
+        </form>        
+        <div class="slugsearch">SlugSearch</div>
+        <!-- Add this button inside the header -->
+        <a href="{{ url_for('add') }}" class="add-button"><strong>+</strong></a>
+    </header>
+    <div class="items">
+        {% for item in items %}
+            <div class="item" onmouseover="showClaimButton(this)" onmouseout="hideClaimButton(this)">
+                <img src="{{ url_for('uploaded_file', filename=item.image_path.split('/')[-1]) }}" alt="Item Image">
+                <p><strong>Location:</strong> {{ item['location'] }}</p>
+                <p><strong>Time:</strong> {{ item['time'] }}</p>
+                <p><strong>Category:</strong> {{ item['category'] }}</p>
+                <!-- Display the description at the bottom of the card -->
+                <p><strong>Description:</strong> {{ item['description'] }}</p>
+                <button class="claim-button" onclick="claimItem({{ item['id'] }})"><strong>Claim</strong></button>
+            </div>
+        {% endfor %}
+        {% for _ in range(4) %}
+            <div class="fake-card"></div>
+        {% endfor %}
+    </div>
+</body>
+</html>
